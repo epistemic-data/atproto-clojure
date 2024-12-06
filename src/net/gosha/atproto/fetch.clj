@@ -7,15 +7,27 @@
    [net.gosha.atproto.core   :as core]))
 
 (defn fetch-author-feed
-  "GET request for user's posts using existing client infrastructure"
-  [actor & {:keys [limit cursor]
-            :or   {limit 50}}]
-  (let [params {:actor  actor
-                :limit  limit
-                :cursor cursor}]
-    (:body (client/get-req 
-            "/xrpc/app.bsky.feed.getAuthorFeed"
-            {:params params}))))
+  "GET request for user's posts using existing client infrastructure.
+   Fetches and filters posts from the last N days."
+  [actor & {:keys [limit cursor days-ago]
+            :or   {limit    50
+                   days-ago 7}}]
+  (let [cutoff   (jt/local-date-time (jt/minus (jt/local-date) (jt/days days-ago)))
+        params   {:actor  actor
+                  :limit  limit
+                  :cursor cursor}
+        response (:body (client/get-req
+                          "/xrpc/app.bsky.feed.getAuthorFeed"
+                          {:params params}))
+        posts    (get-in response [:feed])
+        in-range? (fn [post]
+                   (let [post-date (-> post 
+                                     (get-in [:post :indexedAt])
+                                     jt/instant
+                                     (jt/local-date-time "UTC"))]
+                     (jt/not-before? post-date cutoff)))]
+    {:feed   (filterv in-range? posts)
+     :cursor (:cursor response)}))
 
 (comment
   ;; Still looking for a way to read data without this auth setup
@@ -27,5 +39,12 @@
   
   (client/authenticate!)
   
-  (fetch-author-feed "chaselambert.dev" :limit 10)
-  (fetch-author-feed "vanderhart.net"   :limit 10))
+  (fetch-author-feed "chaselambert.dev" :limit 5)
+  (fetch-author-feed "vanderhart.net"   :days-ago 1 :limit 5)
+  (fetch-author-feed "vanderhart.net"   :limit 5)
+  
+  ;; Debug: Look at dates of returned posts
+  (-> (fetch-author-feed "vanderhart.net" :days-ago 3)
+      :feed
+      (->> (mapv :indexedAt))
+      clojure.pprint/pprint))
