@@ -1,7 +1,6 @@
 (ns net.gosha.atproto.client
   (:require [org.httpkit.client :as http]
             [charred.api :as json]
-            [clojure.pprint :refer [pprint]]
             [net.gosha.atproto.core :as core]))
 
 (defn request

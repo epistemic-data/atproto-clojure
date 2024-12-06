@@ -1,24 +1,30 @@
-.DS_Store
-.idea
 .clj-kondo
+.DS_Store
+.env
+.idea
 .lsp
-*.log
-tmp/
 
-/target
-/classes
-/checkouts
-profiles.clj
-pom.xml
-pom.xml.asc
-*.jar
 *.class
+*.jar
+*.log
+
 /.lein-*
+/.cpcache
 /.nrepl-port
 /.prepl-port
 /.cpcache
 
+resources/dev-config.edn
 sample-messages.edn
-/samples
 
+/classes
+/checkouts
+/samples
+/target
+
+tmp/
+
+pom.xml
+pom.xml.asc
+profiles.clj
 resources/dev-config.edn
