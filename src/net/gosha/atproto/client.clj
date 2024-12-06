@@ -31,11 +31,19 @@
                             :error   e}))]
           (if (:success response)
             (let [result (:result response)]
+              ;; (if (<= 200 (:status result) 299)
+              ;;   (update result :body json/read-str :key-fn keyword)
+              ;;   (throw (ex-info "API request failed"
+              ;;                   {:status (:status result)
+              ;;                    :body   (:body result)}))))
+              ;; In client.clj, update the error handling:
               (if (<= 200 (:status result) 299)
-                (update result :body json/read-str :key-fn keyword)
-                (throw (ex-info "API request failed"
-                                {:status (:status result)
-                                 :body   (:body result)}))))
+                  (update result :body json/read-str :key-fn keyword)
+                  (throw (ex-info "API request failed"
+                                 {:status (:status result)
+                                  :body   (:body result)
+                                  :url    url
+                                  :method method}))))
             (if (>= attempt retries)
               (throw (:error response))
               (do

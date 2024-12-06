@@ -78,6 +78,6 @@
     (println "\nReceived event:" 
              {:type       (:type event)
               :collection (:collection event)
-              :text      (get-in event [:record :text])}))
+              :text       (get-in event [:record :text])}))
   
   (disconnect conn))
