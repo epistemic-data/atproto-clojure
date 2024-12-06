@@ -1,26 +1,24 @@
 (ns net.gosha.atproto.fetch
   (:require
-   [org.httpkit.client       :as http]
-   [clojure.data.json        :as json]
-   [clojure.java.io          :as io]
    [aero.core                :as aero]
+   [clojure.java.io          :as io]
    [java-time.api            :as jt]
-   [net.gosha.atproto.core   :as core]
-   [net.gosha.atproto.client :as client]))
+   [net.gosha.atproto.client :as client]
+   [net.gosha.atproto.core   :as core]))
 
 (defn fetch-author-feed
-  "GET request for a user's posts with authentication"
+  "GET request for user's posts using existing client infrastructure"
   [actor & {:keys [limit cursor]
             :or   {limit 50}}]
   (let [params {:actor  actor
                 :limit  limit
                 :cursor cursor}]
-    (client/get-req 
-     "/xrpc/app.bsky.feed.getAuthorFeed"
-     {:params params})))
+    (:body (client/get-req 
+            "/xrpc/app.bsky.feed.getAuthorFeed"
+            {:params params}))))
 
 (comment
-  ;; First initialize and authenticate using existing setup
+  ;; Still looking for a way to read data without this auth setup
   (let [dev-config (aero/read-config (io/resource "dev-config.edn"))]
     (core/init 
      {:base-url     "https://bsky.social"
@@ -29,5 +27,5 @@
   
   (client/authenticate!)
   
-  ;; Now try the fetch
-  (fetch-author-feed "chaselambert.dev" :limit 10))
+  (fetch-author-feed "chaselambert.dev" :limit 10)
+  (fetch-author-feed "vanderhart.net"   :limit 10))

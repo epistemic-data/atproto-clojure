@@ -11,17 +11,18 @@
   - `body`     : Request body (optional)
   - `headers`  : Additional headers (optional)
   - `retries`  : Number of retries for transient failures"
-  [method endpoint & [{:keys [body headers retries] :or {retries 3}}]]
+  [method endpoint & [{:keys [body headers params retries] :or {retries 3}}]]
   (let [{:keys [base-url auth-token]} @core/config]
     (when-not base-url
       (throw (ex-info "SDK not initialised: missing base-url" {})))
     (let [url (str base-url endpoint)
-          options {:method  method
-                   :url     url
-                   :headers (merge {"Authorization" (str "Bearer " auth-token)
-                                    "Content-Type" "application/json"}
-                                   headers)
-                   :body    (when body (json/write-str body))}]
+          options {:method       method
+                   :url          url
+                   :headers      (merge {"Authorization" (str "Bearer " auth-token)
+                                         "Content-Type" "application/json"}
+                                        headers)
+                   :query-params params
+                   :body         (when body (json/write-str body))}]
       (loop [attempt 0]
         (let [response (try
                          {:success true
@@ -31,19 +32,11 @@
                             :error   e}))]
           (if (:success response)
             (let [result (:result response)]
-              ;; (if (<= 200 (:status result) 299)
-              ;;   (update result :body json/read-str :key-fn keyword)
-              ;;   (throw (ex-info "API request failed"
-              ;;                   {:status (:status result)
-              ;;                    :body   (:body result)}))))
-              ;; In client.clj, update the error handling:
               (if (<= 200 (:status result) 299)
-                  (update result :body json/read-str :key-fn keyword)
-                  (throw (ex-info "API request failed"
-                                 {:status (:status result)
-                                  :body   (:body result)
-                                  :url    url
-                                  :method method}))))
+                (update result :body json/read-str :key-fn keyword)
+                (throw (ex-info "API request failed"
+                                {:status (:status result)
+                                 :body   (:body result)}))))
             (if (>= attempt retries)
               (throw (:error response))
               (do
