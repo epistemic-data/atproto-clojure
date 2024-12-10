@@ -4,17 +4,6 @@
     [net.gosha.atproto.core :as core]
     [org.httpkit.client     :as http]))
 
-(def json-writer
-  (json/write-json-fn
-   {:escape-unicode        true
-    :escape-js-separators true
-    :escape-slash         true}))
-
-(def json-reader
-  (json/parse-json-fn
-   {:key-fn  keyword
-    :profile :immutable}))
-
 (defn request
   "Make an HTTP request to the atproto API.
   - `method`   : HTTP method (:get, :post, etc.)
