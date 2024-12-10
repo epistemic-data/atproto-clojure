@@ -1,8 +1,19 @@
 (ns net.gosha.atproto.client
-  (:require [org.httpkit.client     :as http]
-            [clojure.data.json      :as json]
-            [clojure.pprint         :refer [pprint]]
-            [net.gosha.atproto.core :as core]))
+  (:require 
+    [charred.api            :as json]
+    [net.gosha.atproto.core :as core]
+    [org.httpkit.client     :as http]))
+
+(def json-writer
+  (json/write-json-fn
+   {:escape-unicode        true
+    :escape-js-separators true
+    :escape-slash         true}))
+
+(def json-reader
+  (json/parse-json-fn
+   {:key-fn  keyword
+    :profile :immutable}))
 
 (defn request
   "Make an HTTP request to the atproto API.
@@ -21,7 +32,7 @@
                    :headers (merge {"Authorization" (str "Bearer " auth-token)
                                     "Content-Type" "application/json"}
                                    headers)
-                   :body    (when body (json/write-str body))}]
+                   :body    (when body (json/write-json-str body))}]
       (loop [attempt 0]
         (let [response (try
                          {:success true
@@ -32,7 +43,7 @@
           (if (:success response)
             (let [result (:result response)]
               (if (<= 200 (:status result) 299)
-                (update result :body json/read-str :key-fn keyword)
+                (update result :body json/read-json :key-fn keyword)
                 (throw (ex-info "API request failed"
                                 {:status (:status result)
                                  :body   (:body result)}))))
