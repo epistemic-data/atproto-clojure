@@ -20,3 +20,5 @@ pom.xml.asc
 
 sample-messages.edn
 /samples
+
+resources/dev-config.edn

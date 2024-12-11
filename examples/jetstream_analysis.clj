@@ -1,9 +1,9 @@
-(ns net.gosha.atproto.firehose-analysis
+(ns examples.jetstream-analysis
   (:require
-   [charred.api                :as json]
-   [clojure.core.async         :as async]
-   [clojure.java.io            :as io]
-   [net.gosha.atproto.firehose :as firehose])
+   [charred.api                 :as json]
+   [clojure.core.async          :as async]
+   [clojure.java.io             :as io]
+   [net.gosha.atproto.jetstream :as jetstream])
   (:import
    [java.time Duration Instant]))
 
@@ -211,8 +211,8 @@
 (comment
   
   ;; Example usage for firehose analysis
-  (def conn (firehose/connect-firehose))
-  (def analysis (start-analysis conn :window-duration-seconds 30))
+  (def conn (jetstream/connect-jetstream (async/chan 1024)))
+  (def analysis (start-analysis conn :window-duration-seconds 60))
   
   ;; Get current stats while running
   (get-summary @(:state analysis))
@@ -222,11 +222,11 @@
   (get-summary @(:state analysis))
   
   ;; Cleanup firehose connection
-  (firehose/disconnect conn)
+  (jetstream/disconnect conn)
 
 
   ;; Example usage for sample collection
-  (def conn (firehose/connect-firehose))
+  (def conn (jetstream/connect-jetstream (async/chan 1024)))
   
   ;; Collect 10 messages
   (def collection (collect-samples conn 10))
@@ -243,5 +243,5 @@
   (read-samples "samples/small-sample.json")
   
   ;; Cleanup
-  (firehose/disconnect conn)
+  (jetstream/disconnect conn)
   ,)
