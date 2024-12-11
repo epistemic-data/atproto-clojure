@@ -58,8 +58,8 @@
    Updates configuration with auth token."
   []
   (let [endpoint "/xrpc/com.atproto.server.createSession"
-        response (post-req endpoint {:identifier (:username @core/config)}
-                                 :password (:app-password @core/config)
+        response (post-req endpoint {:identifier (:username @core/config)
+                                     :password (:app-password @core/config)}
                        {:base-url (:base-url @core/config)})
         token (get-in response [:body :accessJwt])]
     (swap! core/config assoc :auth-token token)))

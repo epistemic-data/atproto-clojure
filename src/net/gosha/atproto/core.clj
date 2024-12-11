@@ -32,7 +32,7 @@
   ; Exchange app password for auth token
   (net.gosha.atproto.client/authenticate!)
   ; Make API requests
-  (net.gosha.atproto.client/get-req "/xrpc/com.atproto.server.getSession"))
+  (net.gosha.atproto.client/get-req "/xrpc/com.atproto.server.getSession")
   ; ???
   ; Profit
-
+  ,) 
