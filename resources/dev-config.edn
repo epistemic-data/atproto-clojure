@@ -1,2 +1,0 @@
-{:username "chaselambert.dev"
- :password #env BSKY_APP_PASSWORD}
