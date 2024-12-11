@@ -15,6 +15,16 @@
     :async?  false    ; Disable async for small messages
     :bufsize 8192}))  ; Smaller buffer size for small messages}))
 
+(def last-warning-time (atom 0))
+
+(defn warn-rate-limited
+  "Logs a warning message at most once every `interval-ms` milliseconds"
+  [interval-ms msg]
+  (let [current-time (System/currentTimeMillis)]
+    (when (> (- current-time @last-warning-time) interval-ms)
+      (reset! last-warning-time current-time)
+      (log/warn msg))))
+
 (defn create-websocket-client
    "Creates a WebSocket client connected to the Bluesky firehose at the specified URI.
     Messages are parsed as JSON and put onto the output channel with a timeout to prevent
@@ -42,7 +52,8 @@
                               [[output-ch data]] :ok
                               (async/timeout 100) :full)]
               (when (= put-result :full)
-                (log/warn "Buffer full - dropping message. Consider increasing buffer size or processing messages faster."))))
+                (warn-rate-limited 10000 
+                  "Buffer full - dropping message. Consider increasing buffer size or processing messages faster."))))
           (catch Exception e
             (log/error "Parse error:" (.getMessage e)))))
       
