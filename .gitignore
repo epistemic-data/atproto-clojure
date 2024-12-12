@@ -14,9 +14,6 @@
 /.prepl-port
 /.cpcache
 
-resources/dev-config.edn
-sample-messages.edn
-
 /classes
 /checkouts
 /samples
@@ -28,3 +25,4 @@ pom.xml
 pom.xml.asc
 profiles.clj
 resources/dev-config.edn
+resources/openapi/api.json
