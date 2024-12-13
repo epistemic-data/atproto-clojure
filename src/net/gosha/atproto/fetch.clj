@@ -1,43 +1,26 @@
 (ns net.gosha.atproto.fetch
   (:require
-   [martian.core      :as martian]
-   [martian.httpkit   :as martian-http]
-   [clojure.java.io   :as io]
-   [charred.api       :as json])
-  (:import
-   [java.time Instant LocalDateTime ZoneOffset]))
+   [martian.core :as martian]
+   [clojure.java.io :as io]))
 
+(def api-url "https://public.api.bsky.app/xrpc/")
 
-(def api-url "https://public.api.bsky.app")
-(def openapi-url 
-  "https://raw.githubusercontent.com/rdmurphy/atproto-openapi-types/main/spec/api.json")
+(def openapi-spec
+  (-> (io/resource "openapi/api.json")
+      slurp))
 
-(defn load-openapi-spec []
-  (try 
-    (-> (slurp openapi-url)
-        (json/read-json :key-fn keyword))
-    (catch Exception _
-      (-> (io/resource "openapi/api.json")
-          slurp
-          (json/read-json :key-fn keyword)))))
+(def client
+  (martian/bootstrap-openapi api-url "resources/openapi/api.json"))
 
-(defn create-client []
-  (let [spec (load-openapi-spec)]
-    (martian-http/bootstrap-openapi 
-     api-url 
-     {:server-url api-url}
-     spec)))
+;; (def client
+;;   (martian/bootstrap-openapi api-url openapi-spec))
 
 (comment
-  (def client (create-client))
+  (println openapi-spec)
   
-  ;; Let's look at what martian sees
-  (def spec (load-openapi-spec))
+  (martian/explore client) ;; []
   
-  ;; Look at operationIds for feed endpoints
-  (->> spec 
-       :paths 
-       vals 
-       (map #(get-in % [:get :operationId]))
-       (filter #(when % (clojure.string/includes? % "feed")))
-       sort))
+  (martian/response-for client 
+                       :app.bsky.feed.getAuthorFeed 
+                       {:actor "chaselambert.dev"})
+  ,)
