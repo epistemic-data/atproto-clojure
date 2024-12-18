@@ -17,10 +17,6 @@
     {
       "url": "https://api.bsky.app/xrpc/",
       "description": "AT Protocol AppView XRPC server"
-    },
-    {
-      "url": "https://public.api.bsky.app/xrpc/",
-      "description": "AT Protocol Appviw XRPC public server"
     }
   ],
   "paths": {

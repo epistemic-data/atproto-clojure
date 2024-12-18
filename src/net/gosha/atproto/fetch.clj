@@ -1,6 +1,6 @@
 (ns net.gosha.atproto.fetch
   (:require
-   [martian.core :as martian]
+   [martian.core    :as martian]
    [martian.httpkit :as martian-http]))
 
 (def openapi-url 
@@ -28,6 +28,7 @@
 (comment
   ;; Basic feed fetch
   (author-feed "atproto.com")
+  (martian/explore client)
   
   ;; With options
   (author-feed "atproto.com" 
