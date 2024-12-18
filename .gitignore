@@ -1,29 +1,25 @@
-.clj-kondo
 .DS_Store
-.env
 .idea
+*.iml
+.clj-kondo
 .lsp
-
-*.class
-*.jar
 *.log
+tmp/
 
+/target
+/classes
+/checkouts
+profiles.clj
+pom.xml
+pom.xml.asc
+*.jar
+*.class
 /.lein-*
-/.cpcache
 /.nrepl-port
 /.prepl-port
 /.cpcache
 
-/classes
-/checkouts
 /samples
-/target
 
-tmp/
-
-pom.xml
-pom.xml.asc
-profiles.clj
 resources/dev-config.edn
-
 src/net/gosha/atproto/scratch.clj

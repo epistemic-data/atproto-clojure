@@ -1,4 +1,4 @@
-(ns examples.jetstream-analysis
+(ns jetstream-analysis
   (:require
    [charred.api                 :as json]
    [clojure.core.async          :as async]
