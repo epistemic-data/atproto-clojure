@@ -15,7 +15,7 @@
 
    Parameters:
    - session:   API session from (init) for making authenticated requests
-   - actor:     The handle of the user (e.g. 'user.bsky.social')
+   - author:    The handle of the user (e.g. 'user.bsky.social')
    - result-ch: core.async channel where posts will be placed
 
    - opts: Optional map of parameters:
@@ -27,17 +27,17 @@
 
    Returns a channel of posts, each containing the full post data structure
    from the Bluesky API."
-  [session actor result-ch & {:keys [batch-size start-ts max-posts]
-                              :or   {batch-size 100
-                                     max-posts  Long/MAX_VALUE
-                                     start-ts   (.minus
-                                                  (Instant/now)
-                                                  30 ChronoUnit/DAYS)}}]
+  [session author result-ch & {:keys [batch-size start-ts max-posts]
+                               :or   {batch-size 100
+                                      max-posts  Long/MAX_VALUE
+                                      start-ts   (.minus
+                                                   (Instant/now)
+                                                   30 ChronoUnit/DAYS)}}]
   (a/go-loop [cursor nil ; Pagination cursor from API
               post-count 0] ; Request counter for safety limit
     (if (<= max-posts post-count)
       (a/close! result-ch)
-      (let [params {:limit batch-size :actor actor}
+      (let [params {:limit batch-size :actor author}
             params (if cursor (assoc params :cursor cursor) params)
             _ (log/info "Making request")
             response (a/<! (at/call-async session
